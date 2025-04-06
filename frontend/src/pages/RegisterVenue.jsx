@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "../../styles/RegisterVenue.css";
+import "../styles/RegisterVenue.css";
 import {
   FaBuilding,
   FaMapMarkerAlt,
@@ -12,6 +12,8 @@ import {
   FaMusic,
 } from "react-icons/fa";
 import axios from "axios";
+import { ACCESS_TOKEN } from "../constants";
+import { jwtDecode } from "jwt-decode";
 
 const RegisterVenue = () => {
   const [formData, setFormData] = useState({
@@ -23,8 +25,6 @@ const RegisterVenue = () => {
     capacity: "",
     minPrice: "",
     maxPrice: "",
-    review: "1",
-    
   });
 
   const [errors, setErrors] = useState({});
@@ -39,6 +39,14 @@ const RegisterVenue = () => {
       setErrors({ ...errors, [e.target.name]: null });
     }
   };
+
+  const token = localStorage.getItem(ACCESS_TOKEN);
+  let venueownerid = null;
+
+  if (token) {
+    const decoded = jwtDecode(token);
+    venueownerid = decoded.user_id; // or decoded.id based on your token structure
+  }
 
   const validateStage = (stage) => {
     let validationErrors = {};
@@ -91,18 +99,18 @@ const RegisterVenue = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const validationErrors = validateStage(3);
     setErrors(validationErrors);
-  
+
     if (Object.keys(validationErrors).length === 0) {
       setIsSubmitting(true);
-  
+
       // Format the price range (min_price and max_price) from the user input
       const imageUrls = formData.imageurl
         .split("\n")
         .filter((url) => url.trim() !== "");
-  
+
       // Prepare the data to send to the backend
       const submissionData = {
         venuename: formData.venuename,
@@ -113,16 +121,17 @@ const RegisterVenue = () => {
         min_price: parseFloat(formData.minPrice), // Corrected to decimal
         max_price: parseFloat(formData.maxPrice),
         max_capacity: parseInt(formData.capacity), // Corrected to integer
-        category: formData.category,
+        venueownerid: venueownerid,
       };
-  
+
       try {
         const response = await axios.post(
-          `http://localhost:8000/api/venue/`,
+          `http://localhost:8000/api/venueRegister/`,
           submissionData,
           {
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
               // If you have authorization, add your token here
             },
           }
@@ -130,6 +139,17 @@ const RegisterVenue = () => {
         console.log("Venue registered:", response.data);
         setIsSubmitting(false);
         setSubmitted(true);
+
+        setFormData({
+          venuename: "",
+          venueaddress: "",
+          features: "",
+          description: "",
+          imageurl: "",
+          capacity: "",
+          minPrice: "",
+          maxPrice: "",
+        });
       } catch (error) {
         console.error("Error submitting venue:", error);
         if (error.response) {
@@ -139,7 +159,6 @@ const RegisterVenue = () => {
       }
     }
   };
-  
 
   return (
     <div className="register-venue-container">
@@ -235,7 +254,7 @@ const RegisterVenue = () => {
                   <div className="input-with-icon">
                     <FaUserFriends className="icon" />
                     <input
-                      type="text"
+                      type="number"
                       id="capacity"
                       name="capacity"
                       placeholder="Maximum number of guests"
@@ -256,8 +275,8 @@ const RegisterVenue = () => {
                   <div className="input-with-icon">
                     <FaDollarSign className="icon" />
                     <input
-                      type="text"
-                      id="minprice"
+                      type="number"
+                      id="minPrice"
                       name="minPrice"
                       placeholder="E.g., $1000 per day"
                       value={formData.minPrice}
@@ -275,8 +294,8 @@ const RegisterVenue = () => {
                   <div className="input-with-icon">
                     <FaDollarSign className="icon" />
                     <input
-                      type="text"
-                      id="maxprice"
+                      type="number"
+                      id="maxPrice"
                       name="maxPrice"
                       placeholder="E.g., $5000 per day"
                       value={formData.maxPrice}

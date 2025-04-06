@@ -1,3 +1,4 @@
+from .models import Venue
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import Note, UserProfile, Venue, Booking
@@ -71,7 +72,8 @@ class VenueSerializer(serializers.ModelSerializer):
                     "phoneNumber": user_profile.phoneNumber,
                 }
             except UserProfile.DoesNotExist:
-                user_info = {"username": "Unknown", "email": "N/A", "phoneNumber": "N/A"}
+                user_info = {"username": "Unknown",
+                             "email": "N/A", "phoneNumber": "N/A"}
 
             booked_data.append({
                 "start_date": booking.start_date,
@@ -115,3 +117,15 @@ class BookingSerializer(serializers.ModelSerializer):
                 "This venue is already booked for the selected dates.")
 
         return data
+
+
+from rest_framework import serializers
+from .models import Venue
+
+class VenueRegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Venue
+        exclude = ['review','status'] 
+
+
+

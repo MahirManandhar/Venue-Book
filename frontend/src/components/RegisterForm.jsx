@@ -1,15 +1,15 @@
 // R_Form.jsx
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { 
-  FaUser, 
-  FaPhone, 
-  FaEnvelope, 
-  FaLock, 
-  FaEye, 
-  FaEyeSlash, 
+import {
+  FaUser,
+  FaPhone,
+  FaEnvelope,
+  FaLock,
+  FaEye,
+  FaEyeSlash,
   FaMapMarker,
-  FaIdBadge 
+  FaIdBadge,
 } from "react-icons/fa";
 import api from "../api";
 import "../styles/L_form.css";
@@ -51,12 +51,15 @@ function RegisterForm({ route }) {
         address,
         phoneNumber,
         is_venue_owner,
-        fullname
+        fullname,
       });
       setSuccess("Registration successful! Redirecting to login...");
       setTimeout(() => navigate("/login"), 1500);
     } catch (error) {
-      setError(error.response?.data?.message || "Registration failed. Please try again.");
+      setError(
+        error.response?.data?.message ||
+          "Registration failed. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -94,7 +97,6 @@ function RegisterForm({ route }) {
                   />
                 </div>
               </div>
-
 
               <div className="form-group">
                 <div className="input-group">

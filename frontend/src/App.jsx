@@ -6,8 +6,8 @@ import Home from "./pages/Home";
 import Venue from "./pages/Venue";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
-import RegisterVenue from "./pages/RegisterVenue/RegisterVenue";
-import HomePage from './Pages/Home/HomePage';
+import RegisterVenue from "./pages/RegisterVenue";
+import HomePage from "./Pages/Home/HomePage";
 import VenueDetails from "./pages/VenueDetails/VenueDetails";
 
 function Logout() {
@@ -16,18 +16,18 @@ function Logout() {
 }
 
 function App() {
-  const [token, setToken] = useState(localStorage.getItem('access') || null);
+  const [token, setToken] = useState(localStorage.getItem("access") || null);
 
   useEffect(() => {
-    const accessToken = localStorage.getItem('access');
+    const accessToken = localStorage.getItem("access");
     if (accessToken) {
       setToken(accessToken);
     }
   }, []);
 
   const logout = () => {
-    localStorage.removeItem('access');
-    localStorage.removeItem('refresh');
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
     setToken(null);
   };
 
@@ -35,7 +35,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Redirect from "/" to "/home" */}
-         {/* Set HomePage as the initial page */}
+        {/* Set HomePage as the initial page */}
 
         {/* Home route */}
         <Route
@@ -67,13 +67,10 @@ function App() {
         {/* Register route */}
         <Route path="/register" element={<Register />} />
 
-        {/* RegisterVenue route */}  
-        <Route path='/register-venue' element={<RegisterVenue />} />
-
+        {/* RegisterVenue route */}
+        <Route path="/register-venue" element={<RegisterVenue />} />
 
         <Route path="/venue-details/:venueId" element={<VenueDetails />} />
-
-
 
         {/* Not Found route */}
         <Route path="*" element={<NotFound />} />
