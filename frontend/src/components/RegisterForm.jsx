@@ -1,4 +1,3 @@
-// R_Form.jsx
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -14,6 +13,17 @@ import {
 import api from "../api";
 import "../styles/L_form.css";
 import LoadingIndicator from "./LoadingIndicator";
+
+const fieldLabels = {
+  username: "Username",
+  email: "Email",
+  password: "Password",
+  phoneNumber: "Phone Number",
+  address: "Address",
+  fullname: "Full Name",
+  is_venue_owner: "Venue Owner Status",
+  non_field_errors: "Error",
+};
 
 function RegisterForm({ route }) {
   const [username, setUsername] = useState("");
@@ -56,10 +66,43 @@ function RegisterForm({ route }) {
       setSuccess("Registration successful! Redirecting to login...");
       setTimeout(() => navigate("/login"), 1500);
     } catch (error) {
-      setError(
-        error.response?.data?.message ||
-          "Registration failed. Please try again."
-      );
+      const errorData = error.response?.data;
+      const errorMessages = [];
+
+      if (errorData) {
+        if (typeof errorData === "object" && !Array.isArray(errorData)) {
+          Object.entries(errorData).forEach(([field, messages]) => {
+            let label;
+            if (field === "non_field_errors") {
+              label = "Error";
+            } else {
+              label =
+                fieldLabels[field] ||
+                field
+                  .replace(/_/g, " ")
+                  .replace(/(?:^|\s)\w/g, (match) => match.toUpperCase());
+            }
+
+            if (Array.isArray(messages)) {
+              messages.forEach((msg) => errorMessages.push(`${label}: ${msg}`));
+            } else if (typeof messages === "string") {
+              errorMessages.push(`${label}: ${messages}`);
+            } else {
+              errorMessages.push(`${label}: ${JSON.stringify(messages)}`);
+            }
+          });
+        } else if (Array.isArray(errorData)) {
+          errorMessages.push(...errorData);
+        } else if (typeof errorData === "string") {
+          errorMessages.push(errorData);
+        }
+      }
+
+      if (errorMessages.length === 0) {
+        errorMessages.push("Registration failed. Please try again.");
+      }
+
+      setError(errorMessages.join(" "));
     } finally {
       setLoading(false);
     }

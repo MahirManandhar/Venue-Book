@@ -10,6 +10,7 @@ import RegisterVenue from "./pages/RegisterVenue";
 import HomePage from "./Pages/Home/HomePage";
 import VenueDetails from "./pages/VenueDetails/VenueDetails";
 import GuestRoute from "./GuestRoute";
+import Footer from "./components/Footer";
 
 function Logout() {
   localStorage.clear();
@@ -46,12 +47,7 @@ function App() {
         />
 
         {/* Root route: you could redirect based on token existence */}
-        <Route
-          path="/"
-          element={
-            token ? <Navigate to="/home" /> : <HomePage />
-          }
-        />
+        <Route path="/" element={token ? <Navigate to="/home" /> : <HomePage />} />
 
         {/* Protected routes */}
         <Route
@@ -62,7 +58,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/venue"
           element={
@@ -80,6 +75,8 @@ function App() {
         {/* Not Found route */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+      {/* Footer will always be visible on every page */}
+      <Footer />
     </BrowserRouter>
   );
 }
