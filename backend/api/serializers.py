@@ -1,3 +1,4 @@
+from .models import Booking, UserProfile
 from .models import Venue
 from django.contrib.auth.models import User
 from rest_framework import serializers
@@ -12,6 +13,7 @@ class showProfileSerializer(serializers.ModelSerializer):
             'username',
             'email',
         ]
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -75,6 +77,7 @@ class VenueSerializer(serializers.ModelSerializer):
                              "email": "N/A", "phoneNumber": "N/A"}
 
             booked_data.append({
+                "id": booking.id,
                 "start_date": booking.start_date,
                 "end_date": booking.end_date,
                 "user": user_info
@@ -82,15 +85,14 @@ class VenueSerializer(serializers.ModelSerializer):
 
         return booked_data
 
-from rest_framework import serializers
-from .models import Booking, UserProfile
 
 class BookingSerializer(serializers.ModelSerializer):
     user_info = serializers.SerializerMethodField()
 
     class Meta:
         model = Booking
-        fields = ["id", "venue", "start_date", "end_date", "user", "user_info"]
+        fields = ["id", "venue", "start_date",
+                  "end_date", "user", "user_info", "verified"]
 
     def get_user_info(self, obj):
         try:
@@ -121,14 +123,24 @@ class BookingSerializer(serializers.ModelSerializer):
 
         return data
 
-from rest_framework import serializers
-from .models import Venue
+
+class BookingStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Booking
+        # Only allowing the 'verified' field to be updated
+        fields = ['verified']
+
+    def validate(self, data):
+        # Additional validation if needed
+        return data
+
 
 class VenueRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Venue
-        exclude = ['review','status'] 
-        
+        exclude = ['review', 'status']
+
+
 class VenueListSerializer(serializers.ModelSerializer):
     booked_dates = serializers.SerializerMethodField()
 
@@ -160,6 +172,3 @@ class VenueListSerializer(serializers.ModelSerializer):
             })
 
         return booked_data
-
-
-

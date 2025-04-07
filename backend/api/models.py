@@ -54,13 +54,15 @@ class Venue(models.Model):
 
     
 class Booking(models.Model):
-    user=models.ForeignKey(User, on_delete=models.CASCADE,default=1)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     venue = models.ForeignKey("Venue", on_delete=models.CASCADE)
     start_date = models.DateField()
     end_date = models.DateField()
+    verified = models.BooleanField(default=False)  # New field
 
     class Meta:
         unique_together = ("venue", "start_date", "end_date")
 
     def __str__(self):
-        return f"{self.username} booked {self.venue.venuename} from {self.start_date} to {self.end_date}"
+        return f"{self.user.username} booked {self.venue.venuename} from {self.start_date} to {self.end_date}"
+
