@@ -21,7 +21,7 @@ function VenueDetails() {
           return;
         }
           const userProfile = JSON.parse(localStorage.getItem("userProfile"));
-          console.log(start_date, end_date);
+          console.log(userProfile);
           const response = await axios.post("http://127.0.0.1:8000/api/bookings/", {
             user: userProfile.id,
             venue: venueId,

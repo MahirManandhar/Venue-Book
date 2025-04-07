@@ -18,48 +18,28 @@ function L_Form({ route, redirectTo }) {
   const navigate = useNavigate();
   const location = useLocation();
   const message = location.state?.message;
-
   const name = "Login";
 
+  // Regular login handler
   const handleSubmit = async (e) => {
-    setLoading(true);
     e.preventDefault();
-
+    setLoading(true);
     try {
       const res = await api.post(route, { username, password });
-
       localStorage.setItem(ACCESS_TOKEN, res.data.access);
       localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${res.data.access}`;
+      axios.defaults.headers.common["Authorization"] = `Bearer ${res.data.access}`;
 
-      // Add comprehensive logging
-      console.log("Attempting to fetch user profile");
-      console.log("Username:", username);
+      // Fetch user profile after login
+      const response = await axios.get(
+        `http://localhost:8000/api/userProfiles/${username}/`
+      );
+      localStorage.setItem("userProfile", JSON.stringify(response.data));
 
-      try {
-        const response = await axios.get(
-          `http://localhost:8000/api/userProfiles/${username}/`
-        );
-
-        console.log("Response data:", response.data);
-        console.log("Response status:", response.status);
-        localStorage.setItem("userProfile", JSON.stringify(response.data));
-
-        // Check if response.data exists and has is_venue_owner
-
-        if (response.data.is_venue_owner) {
-          navigate("/register-venue");
-        } else {
-          navigate("/home");
-        }
-      } catch (fetchError) {
-        console.error("Fetch error:", fetchError);
-        console.error("Fetch error response:", fetchError.response);
-        alert(
-          fetchError.response?.data?.error || "Error fetching user profile"
-        );
+      if (response.data.is_venue_owner) {
+        navigate("/venue");
+      } else {
+        navigate("/home");
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -68,6 +48,7 @@ function L_Form({ route, redirectTo }) {
       setLoading(false);
     }
   };
+
   return (
     <div className="auth-container">
       <div className="auth-left">
@@ -103,7 +84,7 @@ function L_Form({ route, redirectTo }) {
           {message && <div className="auth-message">⚠️ {message}</div>}
           <h2>{name} your Account</h2>
           <p className="auth-subtitle">It's quick and easy.</p>
-
+          {error && <p className="auth-error">{error}</p>}
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
               <div className="input-group">
@@ -117,7 +98,6 @@ function L_Form({ route, redirectTo }) {
                 />
               </div>
             </div>
-
             <div className="form-group">
               <div className="input-group">
                 <FaLock className="input-icon" />
@@ -136,29 +116,23 @@ function L_Form({ route, redirectTo }) {
                 </div>
               </div>
             </div>
-
             {loading && <LoadingIndicator />}
-
             <button type="submit" className="auth-button" disabled={loading}>
               {loading ? "Logging in..." : name}
             </button>
-
-            {error && <p className="auth-error">{error}</p>}
-
-            <div className="google-login">
-              <button type="button" className="google-button">
-                <AiOutlineGoogle size={24} />
-                Continue With Google
-              </button>
-            </div>
-
-            <p className="auth-switch">
-              Don't have an account?{" "}
-              <Link to="/register" className="switch-link">
-                Sign Up
-              </Link>
-            </p>
           </form>
+          <div className="google-login">
+            <button className="google-button">
+              <AiOutlineGoogle size={24} />
+              Continue With Google
+            </button>
+          </div>
+          <p className="auth-switch">
+            Don't have an account?{" "}
+            <Link to="/register" className="switch-link">
+              Sign Up
+            </Link>
+          </p>
         </motion.div>
       </div>
     </div>

@@ -5,7 +5,8 @@ from . import views
 
 router = DefaultRouter()
 
-router.register(r'bookings', views.BookingViewSet, basename='bookings')
+router.register(r'venue', views.VenueViewSet, basename='venue')
+router.register(r'bookings', views.BookingViewSet)
 router.register(r'venueRegister', views.VenueListCreate,
                 basename='venueRegister')
 
@@ -19,8 +20,8 @@ urlpatterns = [
          name='user-profile'),
     path('userProfiles/<str:username>/', views.UserProfileDetailView.as_view(),
          name='user-profile'),
-    path('venue/', views.VenueViewSet.as_view(), name='venue-list'),
-    path('venue/owner/<int:venueownerid>/', views.VenueViewSet.as_view(),
-         name='venue'),
+     path('venues/', views.VenueViewList.as_view(), name='venues-list'),
+    path('venues/owner/<int:venueownerid>/', views.VenueViewList.as_view(),
+         name='venues'),
     path('', include(router.urls))
 ]

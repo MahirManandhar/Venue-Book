@@ -77,9 +77,6 @@ const HomePage = () => {
                 </div>
                 
                 <div className="nav-buttons">
-                    <Link to="/register-venue" className="register-venue-btn">
-                        Register Your Venue
-                    </Link>
                     <Link to="/login" className="signin-btn">
                         Sign In
                     </Link>
@@ -130,7 +127,7 @@ const HomePage = () => {
             <section className="venue-list">
                 <h2 className="section-title">Popular Venues</h2>
                 <div className="venue-grid">
-                    {venues.slice(0, 4).map((venue) => (
+                    {venues.slice(0, 3).map((venue) => (
                         <motion.div
                             key={venue.venueid}
                             className="venue-card"
