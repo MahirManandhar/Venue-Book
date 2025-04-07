@@ -3,7 +3,7 @@ from rest_framework import status
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework import generics, status
-from .serializers import UserSerializer, NoteSerializer, UserSerializers, showProfileSerializer, VenueSerializer, BookingSerializer, VenueRegisterSerializer
+from .serializers import UserSerializer, NoteSerializer, UserSerializers, VenueListSerializer,showProfileSerializer, VenueSerializer, BookingSerializer, VenueRegisterSerializer
 from .models import Note, UserProfile, Venue, Booking
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
@@ -89,8 +89,12 @@ class UserProfileDetailView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+class VenueViewSet(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]  
+    queryset=Venue.objects.all()
+    serializer_class = VenueSerializer
 
-class VenueViewSet(APIView):
+class VenueViewList(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, venueownerid=None):
@@ -111,7 +115,6 @@ class VenueViewSet(APIView):
 
         serializer = VenueSerializer(venues, many=True)
         return Response(serializer.data)
-
 
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()

@@ -9,6 +9,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import RegisterVenue from "./pages/RegisterVenue";
 import HomePage from "./Pages/Home/HomePage";
 import VenueDetails from "./pages/VenueDetails/VenueDetails";
+import GuestRoute from "./GuestRoute";
 
 function Logout() {
   localStorage.clear();
@@ -34,10 +35,25 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Redirect from "/" to "/home" */}
-        {/* Set HomePage as the initial page */}
+        {/* If the user has a token, they will be redirected to "/home" from the login page */}
+        <Route
+          path="/login"
+          element={
+            <GuestRoute>
+              <Login />
+            </GuestRoute>
+          }
+        />
 
-        {/* Home route */}
+        {/* Root route: you could redirect based on token existence */}
+        <Route
+          path="/"
+          element={
+            token ? <Navigate to="/home" /> : <HomePage />
+          }
+        />
+
+        {/* Protected routes */}
         <Route
           path="/home"
           element={
@@ -47,7 +63,6 @@ function App() {
           }
         />
 
-        {/* Venue route */}
         <Route
           path="/venue"
           element={
@@ -57,19 +72,9 @@ function App() {
           }
         />
 
-        {/* Login route */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<Login />} />
-
-        {/* Logout route */}
         <Route path="/logout" element={<Logout />} />
-
-        {/* Register route */}
         <Route path="/register" element={<Register />} />
-
-        {/* RegisterVenue route */}
         <Route path="/register-venue" element={<RegisterVenue />} />
-
         <Route path="/venue-details/:venueId" element={<VenueDetails />} />
 
         {/* Not Found route */}

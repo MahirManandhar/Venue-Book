@@ -13,7 +13,6 @@ class showProfileSerializer(serializers.ModelSerializer):
             'email',
         ]
 
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -83,8 +82,12 @@ class VenueSerializer(serializers.ModelSerializer):
 
         return booked_data
 
+from rest_framework import serializers
+from .models import Booking, UserProfile
 
 class BookingSerializer(serializers.ModelSerializer):
+    user_info = serializers.SerializerMethodField()
+
     class Meta:
         model = Booking
         fields = ["id", "venue", "start_date", "end_date", "user", "user_info"]
@@ -118,7 +121,6 @@ class BookingSerializer(serializers.ModelSerializer):
 
         return data
 
-
 from rest_framework import serializers
 from .models import Venue
 
@@ -126,6 +128,38 @@ class VenueRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Venue
         exclude = ['review','status'] 
+        
+class VenueListSerializer(serializers.ModelSerializer):
+    booked_dates = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Venue
+        fields = ['venueid', 'venuename', 'venueaddress', 'review', 'features',
+                  'status', 'description', 'imageurl', 'venueownerid', 'min_price', 'max_price', 'max_capacity', 'booked_dates']
+
+    def get_booked_dates(self, obj):
+        bookings = Booking.objects.filter(venue=obj).select_related('user')
+
+        booked_data = []
+        for booking in bookings:
+            try:
+                user_profile = UserProfile.objects.get(id=booking.user.id)
+                user_info = {
+                    "username": user_profile.username,
+                    "email": user_profile.email,
+                    "phoneNumber": user_profile.phoneNumber,
+                }
+            except UserProfile.DoesNotExist:
+                user_info = {"username": "Unknown",
+                             "email": "N/A", "phoneNumber": "N/A"}
+
+            booked_data.append({
+                "start_date": booking.start_date,
+                "end_date": booking.end_date,
+                "user": user_info
+            })
+
+        return booked_data
 
 
 
