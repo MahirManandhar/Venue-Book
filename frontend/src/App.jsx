@@ -26,11 +26,11 @@ function App() {
     }
   }, []);
 
-  const logout = () => {
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
-    setToken(null);
-  };
+  // const logout = () => {
+  //   localStorage.removeItem("access");
+  //   localStorage.removeItem("refresh");
+  //   setToken(null);
+  // };
 
   return (
     <BrowserRouter>

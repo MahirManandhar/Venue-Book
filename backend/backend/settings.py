@@ -61,7 +61,7 @@ INSTALLED_APPS = [
     "corsheaders",
     'khalti',
 
-    
+
 ]
 
 MIDDLEWARE = [
@@ -102,9 +102,9 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "Venues",
+        "NAME": "venue",
         "USER": "postgres",
-        "PASSWORD": "saroj",
+        "PASSWORD": "20600703",
         "HOST": "localhost",
         "PORT": "5432",
 

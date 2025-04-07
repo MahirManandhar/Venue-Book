@@ -3,7 +3,8 @@ from rest_framework import status
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework import generics, status
-from .serializers import UserSerializer, NoteSerializer, UserSerializers, VenueListSerializer,showProfileSerializer, VenueSerializer, BookingSerializer, VenueRegisterSerializer
+from rest_framework.decorators import action
+from .serializers import UserSerializer, NoteSerializer, UserSerializers, BookingStatusSerializer, showProfileSerializer, VenueSerializer, BookingSerializer, VenueRegisterSerializer
 from .models import Note, UserProfile, Venue, Booking
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
@@ -89,10 +90,12 @@ class UserProfileDetailView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+
 class VenueViewSet(viewsets.ModelViewSet):
-    permission_classes = [AllowAny]  
-    queryset=Venue.objects.all()
+    permission_classes = [AllowAny]
+    queryset = Venue.objects.all()
     serializer_class = VenueSerializer
+
 
 class VenueViewList(APIView):
     permission_classes = [AllowAny]
@@ -116,10 +119,42 @@ class VenueViewList(APIView):
         serializer = VenueSerializer(venues, many=True)
         return Response(serializer.data)
 
+
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
+
+    def get_serializer_class(self):
+        if self.action in ['update', 'partial_update']:
+            return BookingStatusSerializer
+        return BookingSerializer
+
+    def update(self, request, *args, **kwargs):
+        try:
+            partial = kwargs.pop('partial', False)
+            instance = self.get_object()
+
+            # Log what we're receiving
+            print(f"Update request data: {request.data}")
+
+            serializer = self.get_serializer(
+                instance, data=request.data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+
+            return Response(serializer.data)
+        except Exception as e:
+            # Log the error
+            print(f"Error updating booking: {str(e)}")
+            return Response(
+                {"detail": f"Error updating booking: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
 
 
 class VenueListCreate(viewsets.ModelViewSet):
