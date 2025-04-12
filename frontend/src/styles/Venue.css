@@ -1,9 +1,8 @@
-/* Venue.css - Updated modern design with #ff8c00 & #e63946 color palette */
+/* Venue.css */
 .venue-container {
     max-width: 1600px;
     margin: 0 auto;
     padding: 4rem 2rem;
-    /* Soft background with subtle tint to complement bold accents */
     background: linear-gradient(135deg, #fff5e6, #ffece0);
     min-height: 100vh;
     position: relative;
@@ -18,7 +17,6 @@
     position: relative;
     padding: 1rem 0;
     letter-spacing: -0.5px;
-    /* Bold gradient using the primary colors */
     background: linear-gradient(90deg, #e63946, #ff8c00);
     -webkit-background-clip: text;
     background-clip: text;
@@ -37,6 +35,77 @@
     border-radius: 4px;
   }
   
+/* Notification styles */
+.notification-header {
+  position: relative;
+  display: inline-block;
+}
+
+.notification-icon-container {
+  position: absolute;
+  right: 20px;
+  top: -60px;
+  cursor: pointer;
+  padding: 10px;
+  background: #e63946;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ff8c00;
+  color: white;
+  border-radius: 50%;
+  padding: 3px 8px;
+  font-size: 0.8rem;
+}
+
+.notifications-panel {
+  position: absolute;
+  right: 0;
+  top: 70px;
+  background: white;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  border-radius: 10px;
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 15px;
+}
+
+.notification-item {
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.notification-item.unread {
+  background: #ffe6e6;
+  font-weight: 500;
+}
+
+.notification-item.read {
+  background: #f8f8f8;
+  opacity: 0.7;
+}
+
+.no-notifications {
+  padding: 10px;
+  text-align: center;
+  color: #666;
+}
+
   /* Register Venue Button */
   .register-venue-btn {
     position: absolute;

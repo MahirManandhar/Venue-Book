@@ -91,6 +91,17 @@ class UserProfileDetailView(APIView):
             )
 
 
+class VenueViewId(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, venueid):
+        venue = Venue.objects.filter(venueid=venueid).first()
+        if venue:
+            serializer = VenueSerializer(venue)
+            return Response(serializer.data)
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
 class VenueViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     queryset = Venue.objects.all()
@@ -118,6 +129,46 @@ class VenueViewList(APIView):
 
         serializer = VenueSerializer(venues, many=True)
         return Response(serializer.data)
+
+
+class UserBookingView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, user_id=None):
+        # Check if 'id' query parameter is passed to get a single booking
+        booking_id = request.query_params.get('id')
+        if booking_id:
+            booking = Booking.objects.filter(pk=booking_id).first()
+            if booking:
+                serializer = BookingSerializer(booking)
+                return Response(serializer.data)
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # If user_id is in the path, filter by it
+        if user_id:
+            bookings = Booking.objects.filter(user=user_id)
+        else:
+            # Get user_id from query parameters if not in path
+            query_user_id = request.query_params.get('user_id')
+            if query_user_id:
+                bookings = Booking.objects.filter(user=query_user_id)
+            else:
+                bookings = Booking.objects.all()
+
+        serializer = BookingSerializer(bookings, many=True)
+        return Response(serializer.data)
+
+    def put(self, request, pk=None):
+        booking = get_object_or_404(Booking, pk=pk)
+        serializer = BookingStatusSerializer(
+            booking, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, pk=None):
+        return self.put(request, pk)
 
 
 class BookingViewSet(viewsets.ModelViewSet):

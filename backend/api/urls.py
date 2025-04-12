@@ -7,6 +7,7 @@ router = DefaultRouter()
 
 router.register(r'venue', views.VenueViewSet, basename='venue')
 router.register(r'bookings', views.BookingViewSet)
+
 router.register(r'venueRegister', views.VenueListCreate,
                 basename='venueRegister')
 
@@ -20,8 +21,12 @@ urlpatterns = [
          name='user-profile'),
     path('userProfiles/<str:username>/', views.UserProfileDetailView.as_view(),
          name='user-profile'),
-     path('venues/', views.VenueViewList.as_view(), name='venues-list'),
+    path('venues/', views.VenueViewList.as_view(), name='venues-list'),
     path('venues/owner/<int:venueownerid>/', views.VenueViewList.as_view(),
          name='venues'),
+    path('venues/id/<int:venueid>/', views.VenueViewId.as_view(),
+         name='venues'),
+    path('userbookings/<int:user_id>/', views.UserBookingView.as_view(),
+         name='userbooking'),
     path('', include(router.urls))
 ]
