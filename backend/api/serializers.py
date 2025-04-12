@@ -88,11 +88,13 @@ class VenueSerializer(serializers.ModelSerializer):
 
 class BookingSerializer(serializers.ModelSerializer):
     user_info = serializers.SerializerMethodField()
+    venue_name = serializers.CharField(source='venue.venuename', read_only=True)
+    venue_address = serializers.CharField(source='venue.venueaddress', read_only=True)
 
     class Meta:
         model = Booking
         fields = ["id", "venue", "start_date",
-                  "end_date", "user", "user_info", "verified"]
+                  "end_date", "user", "user_info", "verified",'venue_name', 'venue_address']
 
     def get_user_info(self, obj):
         try:

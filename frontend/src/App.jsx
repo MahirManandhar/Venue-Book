@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
 import Venue from "./pages/Venue";
+import Booked from "./pages/bookedVenue";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RegisterVenue from "./pages/RegisterVenue";
@@ -48,9 +49,7 @@ function App() {
         {/* Root route: you could redirect based on token existence */}
         <Route
           path="/"
-          element={
-            token ? <Navigate to="/home" /> : <HomePage />
-          }
+          element={token ? <Navigate to="/home" /> : <HomePage />}
         />
 
         {/* Protected routes */}
@@ -68,6 +67,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Venue />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/booked"
+          element={
+            <ProtectedRoute>
+              <Booked />
             </ProtectedRoute>
           }
         />
