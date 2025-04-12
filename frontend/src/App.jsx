@@ -4,13 +4,14 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
 import Venue from "./pages/Venue";
-import Booked from "./pages/bookedVenue";
+import UserBookings from "./pages/UserVenues/bookedVenue";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RegisterVenue from "./pages/RegisterVenue";
 import HomePage from "./Pages/Home/HomePage";
 import VenueDetails from "./pages/VenueDetails/VenueDetails";
 import GuestRoute from "./GuestRoute";
+import Footer from "./components/Footer";
 
 function Logout() {
   localStorage.clear();
@@ -61,7 +62,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/venue"
           element={
@@ -75,7 +75,7 @@ function App() {
           path="/booked"
           element={
             <ProtectedRoute>
-              <Booked />
+              <UserBookings />
             </ProtectedRoute>
           }
         />
@@ -88,6 +88,8 @@ function App() {
         {/* Not Found route */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+      {/* Footer will always be visible on every page */}
+      <Footer />
     </BrowserRouter>
   );
 }

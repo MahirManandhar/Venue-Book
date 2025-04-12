@@ -13,6 +13,13 @@ function Home() {
   const itemsPerPage = 12;
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    localStorage.removeItem("userProfile");
+    navigate("/");
+  };
+
   useEffect(() => {
     const fetchVenues = async () => {
       try {
@@ -40,6 +47,14 @@ function Home() {
 
   return (
     <div className="home-container">
+      <button className="my-venues-btn" onClick={() => navigate("/booked")}>
+        My Bookings
+      </button>
+
+      <button className="logout-btn" onClick={handleLogout}>
+        Logout
+      </button>
+
       <h1 className="section-title">Discover Stunning Venues</h1>
 
       <div className="venue-grid">

@@ -7,6 +7,67 @@
   min-height: 100vh;
 }
 
+.my-venues-btn {
+  position: absolute;
+  top: 2rem;
+  left: 1.5rem;
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(135deg, #e63946, #c5303a);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+}
+
+.my-venues-btn:hover {
+  background: linear-gradient(135deg, #c5303a, #a32830);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4);
+}
+
+/* Home.css */
+.logout-btn {
+  position: absolute;
+  top: 2rem;
+  right: 1.5rem;
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(135deg, #e63946, #c5303a);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);
+}
+
+.logout-btn:hover {
+  background: linear-gradient(135deg, #c5303a, #a32830);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(230, 57, 70, 0.4);
+}
+
+@media (max-width: 768px) {
+  .logout-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .logout-btn {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.8rem;
+    top: 1.5rem;
+    right: 1rem;
+  }
+}
+
 .section-title {
   text-align: center;
   margin-bottom: 4rem;
