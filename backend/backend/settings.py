@@ -95,6 +95,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
+KHALTI_SECRET_KEY = 'd9bffd15501b47fbac8efd37607ff894'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -102,9 +103,9 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "Venues",
+        "NAME": "venue",
         "USER": "postgres",
-        "PASSWORD": "saroj",
+        "PASSWORD": "Aayush12@",
         "HOST": "localhost",
         "PORT": "5432",
 

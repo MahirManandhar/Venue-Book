@@ -15,36 +15,48 @@ function VenueDetails() {
   const token = localStorage.getItem(ACCESS_TOKEN);
   const decoded = jwtDecode(token);
   const userId = decoded.user_id;
+  
 
-  const handleBooking = async () => {
-    try {
-      const userToken = localStorage.getItem("access");
-
-      if (!userToken) {
-        alert("Please log in to book a venue.");
-        return;
-      }
-      const userProfile = JSON.parse(localStorage.getItem("userProfile"));
-      console.log(userProfile);
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/bookings/",
-        {
-          user: userId,
-          venue: venueId,
-          start_date: start_date,
-          end_date: end_date,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        }
-      );
-      alert("Booking confirmed!");
-    } catch (response) {
-      alert(error.response.data.detail || "Booking failed!");
+ const handleBooking = async () => {
+  try {
+    const userToken = localStorage.getItem("access");
+    localStorage.setItem("userId", userId);
+    localStorage.setItem("venueId", venueId);
+    localStorage.setItem("start_date", start_date);
+    localStorage.setItem("end_date", end_date);
+    if (!userToken) {
+      alert("Please log in to book a venue.");
+      return;
     }
-  };
+    console.log(userToken)
+    const amount = 10000; // 100 Rs in paisa (you can make dynamic)
+
+    const response = await axios.post(
+      "http://127.0.0.1:8000/api/create-khalti-payment/",
+      {
+        user: userId,
+        venue: venueId,
+        start_date: start_date,
+        end_date: end_date,
+        amount: amount,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      }
+    );
+
+    window.location.href = response.data.payment_url;
+  } catch (error) {
+    console.error(error);
+    alert(error.response?.data?.detail || "Failed to initiate payment!");
+  }
+};
+
+
+  
+  
   const [start_date, setStartDate] = useState("");
   const [end_date, setEndDate] = useState("");
 

@@ -26,6 +26,7 @@ function Home() {
         const response = await axios.get("http://127.0.0.1:8000/api/venue/");
         setVenues(response.data);
         setLoading(false);
+        console.log(response.data);
       } catch (err) {
         setError(err.message);
         setLoading(false);

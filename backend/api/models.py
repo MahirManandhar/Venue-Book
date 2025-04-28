@@ -3,7 +3,24 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+class CanceledBooking(models.Model):
 
+    venue_name = models.CharField(max_length=255, null=True)
+    user_id = models.IntegerField()
+    user_name = models.CharField(max_length=255, null=True)
+    venue_address = models.CharField(max_length=255, null=True)
+
+    start_date = models.DateField()
+    end_date = models.DateField()
+    canceled_at = models.DateTimeField(auto_now_add=True)
+    reason = models.TextField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['-canceled_at']
+
+    def __str__(self):
+        return str(self.user_id)
+    
 class Note(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()

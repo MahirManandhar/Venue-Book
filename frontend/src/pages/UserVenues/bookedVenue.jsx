@@ -20,6 +20,7 @@ import "./bookedVenue.css";
 
 function UserBookings() {
   const [bookings, setBookings] = useState([]);
+  const [canceledBookings, setCanceledBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedBooking, setExpandedBooking] = useState(null);
   const [filterStatus, setFilterStatus] = useState("all");
@@ -66,6 +67,18 @@ function UserBookings() {
         );
 
         setBookings(bookingsWithVenueDetails);
+
+        // Get canceled bookings
+        const canceledResponse = await api.get(`http://localhost:8000/api/canceled/${userId}/`);
+        const canceledBookingsWithVenueDetails = canceledResponse.data.map((booking) => ({
+          ...booking,
+          venueDetails: {
+            venuename: booking.venue_name,
+            venueaddress: booking.venue_address,
+          },
+        }));
+        
+        setCanceledBookings(canceledBookingsWithVenueDetails);
       } catch (error) {
         console.error("Error fetching bookings:", error);
       } finally {
@@ -123,7 +136,9 @@ function UserBookings() {
   };
 
   const filteredBookings = filterStatus === "all" 
-    ? bookings 
+    ? [...bookings, ...canceledBookings] 
+    : filterStatus === "canceled"
+    ? canceledBookings
     : bookings.filter(booking => 
         filterStatus === "confirmed" ? booking.verified : !booking.verified
       );
@@ -202,6 +217,12 @@ function UserBookings() {
           >
             Pending
           </button>
+          <button 
+            className={`ub-filter-btn ${filterStatus === "canceled" ? "active" : ""}`}
+            onClick={() => setFilterStatus("canceled")}
+          >
+            Canceled
+          </button>
         </motion.div>
       </div>
 
@@ -232,6 +253,10 @@ function UserBookings() {
                       {booking.verified ? (
                         <span className="ub-status-badge confirmed">
                           <FaCheckCircle /> Confirmed
+                        </span>
+                      ) : booking.canceled_at ? (
+                        <span className="ub-status-badge canceled">
+                          <FaTimesCircle /> Canceled
                         </span>
                       ) : (
                         <span className="ub-status-badge pending">
@@ -282,28 +307,23 @@ function UserBookings() {
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <div className="ub-venue-additional-details">
-                        <div className="ub-detail-item">
-                          <FaUsers className="ub-detail-icon" />
-                          <span>Capacity: {booking.venueDetails?.max_capacity || "N/A"}</span>
-                        </div>
-                        <div className="ub-detail-item">
-                          <FaRupeeSign className="ub-detail-icon" />
-                          <span>
-                            Price Range: Rs.{booking.venueDetails?.min_price || "N/A"} - 
-                            Rs.{booking.venueDetails?.max_price || "N/A"}
-                          </span>
-                        </div>
-                      </div>
+
                       
-                      <motion.button 
-                        className="ub-cancel-booking-btn"
-                        onClick={() => handleCancelBooking(booking.id)}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <FaTimesCircle /> Cancel Booking
-                      </motion.button>
+                      {booking.canceled_at ? (
+                        <div className="ub-canceled-info">
+                          <p>Booking was canceled on {formatDate(booking.canceled_at)}</p>
+                          <p>Reason: {booking.reason || "No reason provided"}</p>
+                        </div>
+                      ) : (
+                        <motion.button 
+                          className="ub-cancel-booking-btn"
+                          onClick={() => handleCancelBooking(booking.id)}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <FaTimesCircle /> Cancel Booking
+                        </motion.button>
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>

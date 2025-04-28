@@ -85,6 +85,17 @@ function VenuesList() {
       const currentBooking = bookingResponse.data;
 
       if (newStatus === "deleted") {
+        await api.post(`http://127.0.0.1:8000/api/canceled/`, {
+
+
+          venue_name: currentBooking.venue_name,
+          venue_address: currentBooking.venue_address,
+          user_id: currentBooking.user,
+          start_date: currentBooking.start_date,
+          end_date: currentBooking.end_date,
+          canceled_at: new Date().toISOString(),
+          reason: "Canceled by venue owner" // Could add a reason parameter or field
+        });
         // Delete the booking
         await api.delete(`http://127.0.0.1:8000/api/bookings/${bookingId}/`);
         console.log(`Booking ${bookingId} deleted.`);

@@ -12,6 +12,9 @@ import HomePage from "./Pages/Home/HomePage";
 import VenueDetails from "./pages/VenueDetails/VenueDetails";
 import GuestRoute from "./GuestRoute";
 import Footer from "./components/Footer";
+import PaymentSuccess from "./pages/PaymentSuccess";
+
+
 
 function Logout() {
   localStorage.clear();
@@ -84,6 +87,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/register-venue" element={<RegisterVenue />} />
         <Route path="/venue-details/:venueId" element={<VenueDetails />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
 
         {/* Not Found route */}
         <Route path="*" element={<NotFound />} />

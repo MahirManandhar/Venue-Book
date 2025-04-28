@@ -2,7 +2,17 @@ from .models import Booking, UserProfile
 from .models import Venue
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Note, UserProfile, Venue, Booking
+from .models import Note, UserProfile, Venue, Booking, CanceledBooking
+
+class CanceledBookingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CanceledBooking
+        fields = '__all__'
+
+    def validate(self, data):
+        if data['start_date'] > data['end_date']:
+            raise serializers.ValidationError("End date must be after start date")
+        return data
 
 
 class showProfileSerializer(serializers.ModelSerializer):
