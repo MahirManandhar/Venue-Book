@@ -1,3 +1,6 @@
+from datetime import datetime
+from django.conf import settings
+import requests
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 from django.shortcuts import render
@@ -30,7 +33,7 @@ class CanceledBookingViewSet(APIView):
 
     def get_queryset(self, user_id=None):
         queryset = CanceledBooking.objects.all()
-        
+
         # Filter by user_id if it's provided
         if user_id is not None:
             queryset = queryset.filter(user_id=user_id)
@@ -51,11 +54,10 @@ class CanceledBookingViewSet(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    
+
 
 class ShowProfile(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request):
         serializer = showProfileSerializer(request.user)
@@ -247,10 +249,6 @@ class VenueListCreate(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
 
-import requests
-from django.conf import settings
-from datetime import datetime
-
 class KhaltiPaymentView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -259,7 +257,8 @@ class KhaltiPaymentView(APIView):
         venue_id = request.data.get("venue")
         start_date = request.data.get("start_date")
         end_date = request.data.get("end_date")
-        amount = request.data.get("amount")  # in paisa (eg: Rs 100 = 10000 paisa)
+        # in paisa (eg: Rs 100 = 10000 paisa)
+        amount = request.data.get("amount")
 
         if not all([user_id, venue_id, start_date, end_date, amount]):
             return Response({"detail": "Missing fields"}, status=status.HTTP_400_BAD_REQUEST)
