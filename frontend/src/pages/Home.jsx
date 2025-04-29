@@ -1,8 +1,7 @@
-//Home.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaArrowRight } from "react-icons/fa";
+import { FaArrowRight, FaCalendarAlt, FaSignOutAlt, FaSearch } from "react-icons/fa";
 import "../styles/Home.css";
 
 function Home() {
@@ -10,6 +9,7 @@ function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 12;
   const navigate = useNavigate();
 
@@ -39,24 +39,43 @@ function Home() {
     navigate(`/venue-details/${venueId}`);
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const currentVenues = venues.slice(0, indexOfLastItem);
-  const hasMore = venues.length > indexOfLastItem;
+  const filteredVenues = venues.filter(venue => 
+    venue.venuename.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    venue.venueaddress.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  if (loading) return <div className="loading">Loading venues...</div>;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const currentVenues = filteredVenues.slice(0, indexOfLastItem);
+  const hasMore = filteredVenues.length > indexOfLastItem;
+
+  if (loading) return <div className="loading-container"><div className="loading-spinner"></div><p>Loading stunning venues...</p></div>;
   if (error) return <div className="error">Error: {error}</div>;
 
   return (
     <div className="home-container">
-      <button className="my-venues-btn" onClick={() => navigate("/booked")}>
-        My Bookings
-      </button>
+      <header className="app-header">
+        <h1 className="app-logo">Event<span>Sphere</span></h1>
+          <FaSearch className="search-icon" />
+          <input 
+            type="text" 
+            placeholder="Search venues by name or location..." 
+            className="search-input"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        <div className="header-actions">
+          <button className="my-venues-btn" onClick={() => navigate("/booked")}>
+            <FaCalendarAlt /> My Bookings
+          </button>
+          <button className="logout-btn" onClick={handleLogout}>
+            <FaSignOutAlt /> Logout
+          </button>
+        </div>
+      </header>
 
-      <button className="logout-btn" onClick={handleLogout}>
-        Logout
-      </button>
-
-      <h1 className="section-title">Discover Stunning Venues</h1>
+      <section className="hero-sectionn">
+        <h1 className="section-title">Discover Stunning Venues</h1>
+      </section>
 
       <div className="venue-grid">
         {currentVenues.map((venue) => (
@@ -73,13 +92,19 @@ function Home() {
                 alt={venue.venuename}
                 className="venue-image"
               />
-              <div className="price-badge">From Rs.{venue.starting_price}</div>
+              <div className="price-badge">From Rs.35000{venue.starting_price}</div>
+              <div className="venue-overlay">
+                <button className="view-details-btn">View Details</button>
+              </div>
             </div>
-
             <div className="venue-content">
               <div className="text-container">
                 <h3 className="venue-title">{venue.venuename}</h3>
                 <p className="venue-address">{venue.venueaddress}</p>
+                <div className="venue-features">
+                  <span className="feature-tag">Wedding</span>
+                  <span className="feature-tag">Corporate</span>
+                </div>
               </div>
               <div className="button-container">
                 <button className="book-now-btn">
@@ -90,7 +115,14 @@ function Home() {
           </div>
         ))}
       </div>
-
+      
+      {filteredVenues.length === 0 && (
+        <div className="no-results">
+          <h3>No venues found matching "{searchTerm}"</h3>
+          <p>Try adjusting your search terms or browse all venues</p>
+        </div>
+      )}
+      
       {hasMore && (
         <button
           className="show-more-btn"
@@ -99,6 +131,8 @@ function Home() {
           Show More Venues
         </button>
       )}
+      
+     
     </div>
   );
 }
