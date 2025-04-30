@@ -25,6 +25,18 @@ const fieldLabels = {
   non_field_errors: "Error",
 };
 
+const customErrorMessages = {
+  username: {
+    "This field must be unique.": "Username is already taken.",
+  },
+  email: {
+    "This field must be unique.": "An account with this email already exists.",
+  },
+  phoneNumber: {
+    "This field must be unique.": "Phone number already registered.",
+  },
+};
+
 function RegisterForm({ route }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -69,32 +81,21 @@ function RegisterForm({ route }) {
       const errorData = error.response?.data;
       const errorMessages = [];
 
-      if (errorData) {
-        if (typeof errorData === "object" && !Array.isArray(errorData)) {
-          Object.entries(errorData).forEach(([field, messages]) => {
-            let label;
-            if (field === "non_field_errors") {
-              label = "Error";
-            } else {
-              label =
-                fieldLabels[field] ||
-                field
-                  .replace(/_/g, " ")
-                  .replace(/(?:^|\s)\w/g, (match) => match.toUpperCase());
-            }
+      if (errorData && typeof errorData === "object") {
+        for (const [field, messages] of Object.entries(errorData)) {
+          let label = fieldLabels[field] || field;
 
-            if (Array.isArray(messages)) {
-              messages.forEach((msg) => errorMessages.push(`${label}: ${msg}`));
-            } else if (typeof messages === "string") {
-              errorMessages.push(`${label}: ${messages}`);
-            } else {
-              errorMessages.push(`${label}: ${JSON.stringify(messages)}`);
-            }
-          });
-        } else if (Array.isArray(errorData)) {
-          errorMessages.push(...errorData);
-        } else if (typeof errorData === "string") {
-          errorMessages.push(errorData);
+          if (Array.isArray(messages)) {
+            messages.forEach((msg) => {
+              if (customErrorMessages[field] && customErrorMessages[field][msg]) {
+                errorMessages.push(customErrorMessages[field][msg]);
+              } else {
+                errorMessages.push(`${label}: ${msg}`);
+              }
+            });
+          } else if (typeof messages === "string") {
+            errorMessages.push(`${label}: ${messages}`);
+          }
         }
       }
 
@@ -128,9 +129,9 @@ function RegisterForm({ route }) {
 
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-grid">
-              <div className="form-group">
-                <div className="input-group">
-                  <FaIdBadge className="input-icon" />
+              <div className="form-groups">
+                <div className="input-groups">
+                  <FaIdBadge className="input-icons" />
                   <input
                     type="text"
                     value={username}
@@ -141,9 +142,9 @@ function RegisterForm({ route }) {
                 </div>
               </div>
 
-              <div className="form-group">
-                <div className="input-group">
-                  <FaUser className="input-icon" />
+              <div className="form-groups">
+                <div className="input-groups">
+                  <FaUser className="input-icons" />
                   <input
                     type="text"
                     value={fullname}
@@ -154,9 +155,9 @@ function RegisterForm({ route }) {
                 </div>
               </div>
 
-              <div className="form-group">
-                <div className="input-group">
-                  <FaEnvelope className="input-icon" />
+              <div className="form-groups">
+                <div className="input-groups">
+                  <FaEnvelope className="input-icons" />
                   <input
                     type="email"
                     value={email}
@@ -167,9 +168,9 @@ function RegisterForm({ route }) {
                 </div>
               </div>
 
-              <div className="form-group">
-                <div className="input-group">
-                  <FaPhone className="input-icon" />
+              <div className="form-groups">
+                <div className="input-groups">
+                  <FaPhone className="input-icons" />
                   <input
                     type="tel"
                     value={phoneNumber}
@@ -180,9 +181,9 @@ function RegisterForm({ route }) {
                 </div>
               </div>
 
-              <div className="form-group">
-                <div className="input-group">
-                  <FaMapMarker className="input-icon" />
+              <div className="form-groups">
+                <div className="input-groups">
+                  <FaMapMarker className="input-icons" />
                   <input
                     type="text"
                     value={address}
@@ -192,9 +193,9 @@ function RegisterForm({ route }) {
                 </div>
               </div>
 
-              <div className="form-group">
-                <div className="input-group">
-                  <FaLock className="input-icon" />
+              <div className="form-groups">
+                <div className="input-groups">
+                  <FaLock className="input-icons" />
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
@@ -211,9 +212,9 @@ function RegisterForm({ route }) {
                 </div>
               </div>
 
-              <div className="form-group">
-                <div className="input-group">
-                  <FaLock className="input-icon" />
+              <div className="form-groups">
+                <div className="input-groups">
+                  <FaLock className="input-icons" />
                   <input
                     type={showRetypePassword ? "text" : "password"}
                     value={reTypePassword}

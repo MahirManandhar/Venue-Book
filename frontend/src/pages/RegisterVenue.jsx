@@ -9,13 +9,14 @@ import {
   FaCheckCircle,
   FaDollarSign,
   FaUserFriends,
-  FaMusic,
 } from "react-icons/fa";
 import axios from "axios";
 import { ACCESS_TOKEN } from "../constants";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 const RegisterVenue = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     venuename: "",
     venueaddress: "",
@@ -52,31 +53,62 @@ const RegisterVenue = () => {
     let validationErrors = {};
 
     if (stage === 1) {
-      if (!formData.venuename)
+      if (!formData.venuename.trim()) {
         validationErrors.venuename = "Venue name is required";
-      if (!formData.venueaddress)
+      }
+      if (!formData.venueaddress.trim()) {
         validationErrors.venueaddress = "Venue address is required";
+      }
+
     } else if (stage === 2) {
-      if (!formData.features)
-        validationErrors.features = "Features are required";
-      if (!formData.capacity)
+      // Capacity validation
+      if (!formData.capacity.trim()) {
         validationErrors.capacity = "Capacity is required";
+      } else if (isNaN(formData.capacity)) {
+        validationErrors.capacity = "Must be a valid number";
+      } else if (parseInt(formData.capacity) <= 0) {
+        validationErrors.capacity = "Must be greater than 0";
+      }
+
+      // Price validation
       if (!formData.minPrice || !formData.maxPrice) {
-        validationErrors.price = "Price range (min and max) is required";
+        validationErrors.price = "Both price fields are required";
+      } else {
+        const min = parseFloat(formData.minPrice);
+        const max = parseFloat(formData.maxPrice);
+        
+        if (isNaN(min)) validationErrors.minPrice = "Invalid number format";
+        if (isNaN(max)) validationErrors.maxPrice = "Invalid number format";
+        if (min < 0) validationErrors.minPrice = "Cannot be negative";
+        if (max < 0) validationErrors.maxPrice = "Cannot be negative";
+        if (min > max) validationErrors.price = "Min price cannot exceed Max price";
       }
-      if (parseInt(formData.minPrice) > parseInt(formData.maxPrice)) {
-        validationErrors.price =
-          "Min price should not be higher than Max price";
+
+      // Features validation
+      if (!formData.features.trim()) {
+        validationErrors.features = "Features are required";
       }
+
     } else if (stage === 3) {
-      if (!formData.description)
+      // Description validation
+      if (!formData.description.trim()) {
         validationErrors.description = "Description is required";
+      }
 
       const imageUrls = formData.imageurl
-        .split("\n")
-        .filter((url) => url.trim() !== "");
-      if (imageUrls.length === 0)
+        .split('\n')
+        .filter(url => url.trim() !== '');
+        
+      if (imageUrls.length === 0) {
         validationErrors.imageurl = "At least one image URL is required";
+      } else {
+        const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+        const invalidUrls = imageUrls.filter(url => !urlPattern.test(url.trim()));
+        
+        if (invalidUrls.length > 0) {
+          validationErrors.imageurl = "Invalid URL format detected";
+        }
+      }
     }
 
     return validationErrors;
@@ -139,6 +171,8 @@ const RegisterVenue = () => {
         console.log("Venue registered:", response.data);
         setIsSubmitting(false);
         setSubmitted(true);
+        navigate("/venue"); 
+
 
         setFormData({
           venuename: "",
@@ -190,8 +224,7 @@ const RegisterVenue = () => {
 
         <h2>List Your Venue</h2>
         <p className="form-subtitle">
-          {formStage === 1 &&
-            "Start showcasing your venue to thousands of potential clients"}
+          {formStage === 1 && "Start showcasing your venue to thousands of potential clients"}
           {formStage === 2 && "Tell us what makes your venue special"}
           {formStage === 3 && "Upload images to make your venue stand out"}
         </p>
@@ -199,7 +232,6 @@ const RegisterVenue = () => {
         <form onSubmit={handleSubmit}>
           {formStage === 1 && (
             <div className="form-stage">
-              {/* Venue Name Field */}
               <div className="form-field-row">
                 <div className="form-field-label">Venue Name</div>
                 <div className="form-field-input">
@@ -207,22 +239,16 @@ const RegisterVenue = () => {
                     <FaBuilding className="icon" />
                     <input
                       type="text"
-                      id="venuename"
                       name="venuename"
                       placeholder="E.g., Party Palace"
                       value={formData.venuename}
                       onChange={handleChange}
                     />
                   </div>
-                  {errors.venuename && (
-                    <span className="error">{errors.venuename}</span>
-                  )}
+                  {errors.venuename && <span className="error">{errors.venuename}</span>}
                 </div>
               </div>
 
-              {/* Venue Category Field */}
-
-              {/* Venue Address Field */}
               <div className="form-field-row">
                 <div className="form-field-label">Venue Address</div>
                 <div className="form-field-input">
@@ -230,16 +256,13 @@ const RegisterVenue = () => {
                     <FaMapMarkerAlt className="icon" />
                     <input
                       type="text"
-                      id="venueaddress"
                       name="venueaddress"
                       placeholder="E.g., Kathmandu"
                       value={formData.venueaddress}
                       onChange={handleChange}
                     />
                   </div>
-                  {errors.venueaddress && (
-                    <span className="error">{errors.venueaddress}</span>
-                  )}
+                  {errors.venueaddress && <span className="error">{errors.venueaddress}</span>}
                 </div>
               </div>
             </div>
@@ -247,7 +270,6 @@ const RegisterVenue = () => {
 
           {formStage === 2 && (
             <div className="form-stage">
-              {/* Capacity Field */}
               <div className="form-field-row">
                 <div className="form-field-label">Capacity</div>
                 <div className="form-field-input">
@@ -255,77 +277,72 @@ const RegisterVenue = () => {
                     <FaUserFriends className="icon" />
                     <input
                       type="number"
-                      id="capacity"
                       name="capacity"
                       placeholder="Maximum number of guests"
                       value={formData.capacity}
                       onChange={handleChange}
+                      min="1"
+                      step="1"
                     />
                   </div>
-                  {errors.capacity && (
-                    <span className="error">{errors.capacity}</span>
-                  )}
+                  {errors.capacity && <span className="error">{errors.capacity}</span>}
                 </div>
               </div>
 
-              {/* Price Range Field */}
               <div className="form-field-row">
-                <div className="form-field-label">Price Range</div>
+                <div className="form-field-label">Minimum Price ($)</div>
                 <div className="form-field-input">
                   <div className="input-with-icon">
                     <FaDollarSign className="icon" />
                     <input
                       type="number"
-                      id="minPrice"
                       name="minPrice"
-                      placeholder="E.g., $1000 per day"
+                      placeholder="E.g., 1000"
                       value={formData.minPrice}
                       onChange={handleChange}
+                      min="0"
+                      step="0.01"
                     />
                   </div>
-                  {errors.minPrice && (
-                    <span className="error">{errors.minPrice}</span>
-                  )}
+                  {errors.minPrice && <span className="error">{errors.minPrice}</span>}
                 </div>
               </div>
+
               <div className="form-field-row">
-                <div className="form-field-label">Price Range</div>
+                <div className="form-field-label">Maximum Price ($)</div>
                 <div className="form-field-input">
                   <div className="input-with-icon">
                     <FaDollarSign className="icon" />
                     <input
                       type="number"
-                      id="maxPrice"
                       name="maxPrice"
-                      placeholder="E.g., $5000 per day"
+                      placeholder="E.g., 5000"
                       value={formData.maxPrice}
                       onChange={handleChange}
+                      min="0"
+                      step="0.01"
                     />
                   </div>
-                  {errors.maxPrice && (
-                    <span className="error">{errors.maxPrice}</span>
-                  )}
+                  {errors.maxPrice && <span className="error">{errors.maxPrice}</span>}
                 </div>
               </div>
 
-              {/* Features Field */}
+              {errors.price && <div className="form-field-error">{errors.price}</div>}
+
               <div className="form-field-row">
                 <div className="form-field-label">Features & Amenities</div>
                 <div className="form-field-input">
                   <div className="input-with-icon textarea-wrapper">
                     <FaList className="icon" />
                     <textarea
-                      id="features"
                       name="features"
-                      placeholder="List all features (e.g., Parking, WiFi, Sound System, Catering Services)"
+                      placeholder="List features (e.g., Parking, WiFi, Sound System)"
                       value={formData.features}
                       onChange={handleChange}
                       rows="4"
                     />
                   </div>
-                  {errors.features && (
-                    <span className="error">{errors.features}</span>
-                  )}
+                  {errors.features && <span className="error">{errors.features}</span>}
                 </div>
               </div>
             </div>
@@ -333,35 +350,29 @@ const RegisterVenue = () => {
 
           {formStage === 3 && (
             <div className="form-stage">
-              {/* Description Field */}
               <div className="form-field-row">
                 <div className="form-field-label">Venue Description</div>
                 <div className="form-field-input">
                   <div className="input-with-icon textarea-wrapper">
                     <FaFileAlt className="icon" />
                     <textarea
-                      id="description"
                       name="description"
-                      placeholder="Describe your venue in detail. What makes it special and perfect for events?"
+                      placeholder="Describe your venue in detail"
                       value={formData.description}
                       onChange={handleChange}
                       rows="5"
                     />
                   </div>
-                  {errors.description && (
-                    <span className="error">{errors.description}</span>
-                  )}
+                  {errors.description && <span className="error">{errors.description}</span>}
                 </div>
               </div>
 
-              {/* Image URLs Field */}
               <div className="form-field-row">
                 <div className="form-field-label">Image URLs</div>
                 <div className="form-field-input">
                   <div className="input-with-icon textarea-wrapper">
                     <FaImage className="icon" />
                     <textarea
-                      id="imageurl"
                       name="imageurl"
                       placeholder="Enter image URLs (one per line)"
                       value={formData.imageurl}
@@ -369,11 +380,9 @@ const RegisterVenue = () => {
                       rows="4"
                     />
                   </div>
-                  {errors.imageurl && (
-                    <span className="error">{errors.imageurl}</span>
-                  )}
+                  {errors.imageurl && <span className="error">{errors.imageurl}</span>}
                   <div className="help-text">
-                    High-quality images increase the likelihood of bookings.
+                    Example: https://example.com/venue-image.jpg
                   </div>
                 </div>
               </div>
@@ -408,3 +417,4 @@ const RegisterVenue = () => {
 };
 
 export default RegisterVenue;
+
